@@ -106,17 +106,18 @@ class Question(models.Model):
     # question text
     # question grade/mark
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    question = models.CharField(max_length=200, default="question")
+    text = models.CharField(max_length=200, default="question")
     grade =  models.IntegerField(default=0)
 
     # <HINT> A sample model method to calculate if learner get the score of the question
-    def is_get_score(self, selected_ids):
-        all_answers = self.choice_set.filter(is_correct=True).count()
-        selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids).count()
-        if all_answers == selected_correct:
+    def is_get_score(self, selected):
+        all_answers = set(self.choice_set.all())
+        correct_answers = set(self.choice_set.filter(is_correct=True))
+        if correct_answers == all_answers.intersection(selected):
             return True
         else:
-           return False
+            return False
+
 
 
 #  <HINT> Create a Choice Model with:
@@ -128,15 +129,16 @@ class Question(models.Model):
 class Choice(models.Model):
 
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    choice = models.CharField(max_length=200, default="choice")
-
-    def is_correct_choice(self, selected_ids):
-        answer = self.choice_set.filter(is_correct=True)
-        selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids)
-        if answer == selected_correct:
-            return True
-        else:
-           return False
+    text = models.CharField(max_length=200, default="choice")
+    #new_colmn = models.CharField(max_length=200, default="choice")
+    is_correct = models.BooleanField(default=False)
+    #def is_correct_choice(self, selected_ids):
+        #answer = self.choice_set.filter(is_correct=True)
+        #selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids)
+        #if answer == selected_correct:
+            #return True
+        #else:
+           #return False
 
 # <HINT> The submission model
 # One enrollment could have multiple submission
